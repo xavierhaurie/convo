@@ -1,0 +1,6 @@
+com\convo\npc\NpcApplication.class
+com\convo\npc\repository\NpcRepository.class
+com\convo\npc\entity\Npc.class
+com\convo\npc\controller\NpcController.class
+com\convo\npc\dto\NpcDTO.class
+com\convo\npc\exception\NpcNotFoundException.class
