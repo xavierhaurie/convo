@@ -1,0 +1,23 @@
+$kind: http-request
+url: http://localhost:8082/api/v1/person/create
+method: POST
+body:
+  type: formdata
+  content:
+    - type: text
+      key: name
+      value: Churchhill
+      description: ""
+      disabled: false
+    - type: text
+      key: description
+      value: The Lion, excelled on so many fronts
+      description: ""
+      disabled: false
+    - type: file
+      key: |
+        file
+      src: []
+      description: ""
+      disabled: false
+order: 5000

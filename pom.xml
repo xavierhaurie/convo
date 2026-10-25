@@ -23,8 +23,10 @@
     <modules>
         <module>cvo-gateway</module>
 <!--        <module>cvo-user</module>-->
-        <module>cvo-npc</module>
-<!--        <module>cvo-memory</module>-->
+        <module>cvo-person</module>
+        <module>cvo-converse</module>
+        <module>cvo-file</module>
+        <!--        <module>cvo-memory</module>-->
 <!--        <module>cvo-utter</module>-->
 <!--        <module>cvo-credit</module>-->
     </modules>
