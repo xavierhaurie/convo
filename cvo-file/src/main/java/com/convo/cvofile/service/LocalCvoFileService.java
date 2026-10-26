@@ -28,21 +28,20 @@ public class LocalCvoFileService implements CvoFileService {
     @Override
     public String create(MultipartFile file) throws IOException {
         UUID uuid = UUID.randomUUID();
-        String uuidStr = uuid + "-" + file.getOriginalFilename();
-        Path target = this.storageDir.resolve(uuidStr).normalize();
+        Path target = this.storageDir.resolve(uuid.toString()).normalize();
         if (!target.startsWith(this.storageDir)) {
             throw new IOException("Invalid file path: " + file.getOriginalFilename());
         }
         Files.copy(file.getInputStream(), target);
-//        return target.toUri().toString();
         return uuid.toString();
     }
 
     @Override
-    public File get(String url) throws IOException {
-        Path filePath = Paths.get(URI.create(url));
+    public File get(String uuid) throws IOException {
+        Path filePath = this.storageDir.resolve(uuid).normalize();
+
         if (!Files.exists(filePath)) {
-            throw new IOException("CvoFile not found with URL: " + url);
+            throw new IOException("CvoFile not found with UUID: " + uuid);
         }
         File file = filePath.toFile();
         return file;

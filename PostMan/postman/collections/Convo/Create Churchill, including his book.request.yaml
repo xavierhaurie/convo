@@ -4,6 +4,12 @@ method: POST
 body:
   type: formdata
   content:
+    - type: file
+      key: file
+      src:
+        - postman-cloud:///1f1d0b8e-1f25-4130-95fd-7d2925757513
+      description: ""
+      disabled: false
     - type: text
       key: name
       value: Churchhill
@@ -14,10 +20,9 @@ body:
       value: The Lion, excelled on so many fronts
       description: ""
       disabled: false
-    - type: file
-      key: |
-        file
-      src: []
+    - type: text
+      key: isNpc
+      value: "true"
       description: ""
       disabled: false
 order: 5000

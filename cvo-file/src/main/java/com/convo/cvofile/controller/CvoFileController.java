@@ -9,6 +9,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.MediaType;
+
 @RestController
 @RequestMapping("/api/v1")
 public class CvoFileController {
@@ -45,5 +51,22 @@ public class CvoFileController {
             return ResponseEntity.status(500).build();
         }
 
+    }
+
+    @GetMapping("/file/{uuid}")
+    public ResponseEntity<Resource> getCvoFile(@PathVariable String uuid)
+            throws IOException {
+        File file = fileService.get(uuid);
+
+        if (!file.isFile()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Resource resource = new FileSystemResource(file);
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .contentLength(resource.contentLength())
+                .body(resource);
     }
 }

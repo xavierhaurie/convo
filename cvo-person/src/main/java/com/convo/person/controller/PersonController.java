@@ -2,7 +2,6 @@ package com.convo.person.controller;
 
 import com.convo.person.service.PersonService;
 import org.springframework.core.io.Resource;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -44,6 +43,7 @@ public class PersonController {
                     .contentLength(resource.contentLength())
                     .body(resource);
         } catch (Exception e) {
+            e.printStackTrace();
             String errorMessage = "Error downloading book for PERSON id " + personId;
             logger.error(errorMessage, e);
             return ResponseEntity.status(500).build();
@@ -73,9 +73,8 @@ public class PersonController {
         logger.info("Received upload: {} ({} bytes)",
                 file.getOriginalFilename(), file.getSize());
         try {
-            // REST call to Cvo file service to save the file and get back the file UUID
-            // Handle HTTP errors
-            return ResponseEntity.status(500).build();
+            com.convo.person.dto.PersonDTO savedPerson = personService.createPerson(personDTO, file);
+            return ResponseEntity.status(200).body(savedPerson);
         } catch (Exception e) {
             String errorMessage = "Could not reach CVO file service to save the file just uploaded: " + file.getOriginalFilename();
             logger.error(errorMessage, e);

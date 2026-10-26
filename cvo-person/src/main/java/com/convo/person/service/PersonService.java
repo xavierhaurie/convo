@@ -7,12 +7,20 @@ import com.convo.person.exception.PersonNotFoundException;
 import com.convo.person.repository.PersonRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+// For REST call to cvo-file microservice
+import org.springframework.http.MediaType;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestClient;
+
 import java.io.File;
 import java.io.IOException;
+import java.net.http.HttpClient;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,7 +34,6 @@ public class PersonService {
     public PersonService(PersonRepository personRepository) {
         this.personRepository = personRepository;
     }
-    // fill out later when we move methods from controller to service
 
     public PersonDTO getPerson(Long personId) {
         PersonDTO personDTO = personRepository.findById(personId)
@@ -38,16 +45,28 @@ public class PersonService {
     }
 
     public Resource getPersonBook(Long personId) throws IOException {
-        logger.info("PersonService.getPersonBook() called with Person id {}", personId);
         PersonDTO personDTO = personRepository.findById(personId)
                 .map(PersonDTO::from)
                 .orElseThrow(() -> new PersonNotFoundException(personId));
-        logger.info("personRepository.findById() returning {}", personDTO);
-        String url = personDTO.bookFileUuid();
-        // get book from file cvo-file microservice
-        File file = null;
-        Resource resource = new org.springframework.core.io.FileSystemResource(file);
-        return resource;
+
+        String uuid = personDTO.bookFileUuid();
+        if (uuid == null || uuid.isBlank()) {
+            throw new IllegalStateException(
+                    "Person " + personId + " has no book file UUID");
+        }
+
+        byte[] contents = fileClient.get()
+                .uri("/api/v1/file/{uuid}", uuid)
+                .accept(MediaType.APPLICATION_OCTET_STREAM)
+                .retrieve()
+                .body(byte[].class);
+
+        if (contents == null) {
+            throw new IllegalStateException(
+                    "File-service returned no content for UUID " + uuid);
+        }
+
+        return new ByteArrayResource(contents);
     }
 
     public List<PersonDTO> getAllPersons() {
@@ -59,12 +78,39 @@ public class PersonService {
 
     public PersonDTO createPerson(PersonDTO personDTO, MultipartFile file) throws IOException {
         Person person = personDTO.toEntity();
-        // Forward file to cvo-file service for storage and get back a file identifier (e.g., URL or ID) to store in the Person entity
-        String url = null;
-        person.setBookFileUuid(url);
-        PersonDTO saved = PersonDTO.from(personRepository.save(person));
+        String uuid = uploadFile(personDTO, file);
+        person.setBookFileUuid(uuid);
+        personRepository.save(person);
+        return PersonDTO.from(person);
+    }
 
-        return saved;
+    private final RestClient fileClient = RestClient.builder()
+            .baseUrl("http://localhost:8081")
+            .build();
+
+    public record FileUploadResponse(
+            Long id, String name, String description, String uuid) {}
+
+    private String uploadFile(PersonDTO personDTO, MultipartFile file) {
+        MultiValueMap<String, Object> parts = new LinkedMultiValueMap<>();
+        parts.add("name", "person's file: " + personDTO.name());
+        parts.add("description", personDTO.description());
+        parts.add("file", file.getResource());
+
+        FileUploadResponse response = fileClient.post()
+                .uri("/api/v1/file/create")
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .body(parts)
+                .retrieve()
+                .body(FileUploadResponse.class);
+
+        if (response == null || response.uuid() == null
+                || response.uuid().isBlank()) {
+            throw new IllegalStateException(
+                    "File-service returned no file UUID");
+        }
+
+        return response.uuid();
     }
 }
 
