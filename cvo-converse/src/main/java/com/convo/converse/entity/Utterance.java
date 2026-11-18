@@ -7,9 +7,8 @@ public class Utterance {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToOne
-    @JoinColumn(name = "reply_to")
-    private Utterance replyTo;
+    @Column(name = "reply_to_id")
+    private Long replyToId;
     @Column(name = "content")
     private String content;
     @Column(name = "from_person_id")
@@ -20,8 +19,8 @@ public class Utterance {
     public Utterance() {
     }
 
-    public Utterance(Utterance replyTo, String content, Long fromPersonId, Long toPersonId) {
-        this.replyTo = replyTo;
+    public Utterance(Long replyToId, String content, Long fromPersonId, Long toPersonId) {
+        this.replyToId = replyToId;
         this.content = content;
         this.fromPersonId = fromPersonId;
         this.toPersonId = toPersonId;
@@ -35,12 +34,12 @@ public class Utterance {
         this.id = id;
     }
 
-    public Utterance getReplayTo() {
-        return replyTo;
+    public Long getReplyToId() {
+        return replyToId;
     }
 
-    public void setPreviousReply(Utterance previousUtterance) {
-        this.replyTo = previousUtterance;
+    public void setReplyToId(Long replyToId) {
+        this.replyToId = replyToId;
     }
 
     public String getContent() {
@@ -55,7 +54,7 @@ public class Utterance {
         return fromPersonId;
     }
 
-    public void setFromId(Long fromPersonId) {
+    public void setFromPersonId(Long fromPersonId) {
         this.fromPersonId = fromPersonId;
     }
 

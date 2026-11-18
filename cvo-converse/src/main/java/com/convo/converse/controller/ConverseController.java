@@ -29,12 +29,14 @@ public class ConverseController {
     }
 
     @GetMapping("/utterances")
-    public List<UtteranceDTO> getAllReplies() {
-        return converseService.getAllReplies();
+    public List<UtteranceDTO> getAllUtterances() {
+        return converseService.getAllUtterances();
     }
 
-    @PostMapping("/utterance/create")
-    public ResponseEntity<UtteranceDTO> createReply(@RequestBody UtteranceDTO utteranceDTO) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(converseService.createReply(utteranceDTO));
+    @PostMapping(value = "/utterance/create", consumes = "multipart/form-data")
+    public ResponseEntity<UtteranceDTO> createUtterance(@ModelAttribute UtteranceDTO utteranceDTO) {
+        var response = ResponseEntity.status(HttpStatus.CREATED).body(converseService.createUtterance(utteranceDTO));
+        return response;
     }
+
 }

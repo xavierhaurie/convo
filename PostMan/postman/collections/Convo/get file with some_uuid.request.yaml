@@ -1,0 +1,4 @@
+$kind: http-request
+url: http://localhost:8081/api/v1/file/{some_uuid}
+method: GET
+order: 3000

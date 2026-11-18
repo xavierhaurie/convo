@@ -2,4 +2,4 @@ $kind: http-request
 description: ""
 url: http://localhost:8083/api/v1/utterances
 method: GET
-order: 7000
+order: 10000

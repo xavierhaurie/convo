@@ -26,14 +26,15 @@ public class ConverseService {
                 .orElseThrow(() -> new NoSuchElementException("Utterance not found: " + replyId));
     }
 
-    public List<UtteranceDTO> getAllReplies() {
+    public List<UtteranceDTO> getAllUtterances() {
         return converseRepository.findAll().stream()
                 .map(UtteranceDTO::from)
                 .toList();
     }
 
-    public UtteranceDTO createReply(UtteranceDTO utteranceDTO) {
-        logger.info("createReply() called from {} to {}", utteranceDTO.fromPersonId(), utteranceDTO.toPersonId());
+    public UtteranceDTO createUtterance(UtteranceDTO utteranceDTO) {
+        logger.info("createUtterance() called from {} to {}", utteranceDTO.fromPersonId(), utteranceDTO.toPersonId());
         return UtteranceDTO.from(converseRepository.save(utteranceDTO.toEntity()));
     }
+
 }

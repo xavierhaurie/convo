@@ -1,4 +1,4 @@
 $kind: http-request
 url: http://localhost:8082/api/v1/person/3/book
 method: GET
-order: 3000
+order: 7000

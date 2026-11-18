@@ -2,4 +2,4 @@ $kind: http-request
 description: ""
 url: http://localhost:8082/api/v1/persons
 method: GET
-order: 6291
+order: 6000

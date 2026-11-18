@@ -1,0 +1,28 @@
+$kind: http-request
+url: http://localhost:8080/api/v1/person/create
+method: POST
+body:
+  type: formdata
+  content:
+    - type: file
+      key: file
+      src:
+        - postman-cloud:///1f1d0b8e-1f25-4130-95fd-7d2925757513
+      description: ""
+      disabled: false
+    - type: text
+      key: name
+      value: Churchhill
+      description: ""
+      disabled: false
+    - type: text
+      key: description
+      value: The Lion, excelled on so many fronts
+      description: ""
+      disabled: false
+    - type: text
+      key: isNpc
+      value: "true"
+      description: ""
+      disabled: false
+order: 12000

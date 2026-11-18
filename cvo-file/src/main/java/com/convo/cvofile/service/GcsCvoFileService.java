@@ -1,5 +1,8 @@
 package com.convo.cvofile.service;
 
+import com.convo.cvofile.dto.CvoFileDTO;
+import com.convo.cvofile.entity.CvoFile;
+import com.convo.cvofile.repository.CvoFileRepository;
 import com.google.cloud.storage.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
@@ -17,10 +20,15 @@ import java.util.UUID;
 @Profile("gcp")
 public class GcsCvoFileService implements CvoFileService {
 
+    private final CvoFileRepository cvoFileRepository;
+
     private final Storage storage;
     private final String bucket;
 
-    public GcsCvoFileService(@Value("${gcs.bucket}") String bucket) {
+    public GcsCvoFileService(
+            CvoFileRepository cvoFileRepository,
+            @Value("${gcs.bucket}") String bucket) {
+        this.cvoFileRepository = cvoFileRepository;
         this.bucket = bucket;
         this.storage = StorageOptions.getDefaultInstance().getService();
         ensureBucketExists();
@@ -37,7 +45,7 @@ public class GcsCvoFileService implements CvoFileService {
     }
 
     @Override
-    public String create(MultipartFile file) throws IOException {
+    public CvoFileDTO createCvoFile(CvoFileDTO cvoFileDTO, MultipartFile file) throws IOException {
         UUID uuid = UUID.randomUUID();
         String objectName = uuid + "-" + file.getOriginalFilename();
         BlobId blobId = BlobId.of(bucket, objectName);
@@ -47,8 +55,14 @@ public class GcsCvoFileService implements CvoFileService {
 
         storage.create(blobInfo, file.getBytes());
 
-//        return String.format("https://storage.googleapis.com/%s/%s", bucket, objectName);
-        return uuid.toString();
+        // Take care of saving the file info into the database
+        CvoFile fileEntity = cvoFileDTO.toEntity();
+        fileEntity.setUuid(uuid.toString());
+        cvoFileRepository.save(fileEntity);
+        return CvoFileDTO.from(fileEntity);
+
+        // maybe also save thios info:
+        //        String.format("https://storage.googleapis.com/%s/%s", bucket, objectName);
     }
 
     /// This code auto-generated.

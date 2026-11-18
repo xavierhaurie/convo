@@ -1,5 +1,8 @@
 package com.convo.cvofile.service;
 
+import com.convo.cvofile.dto.CvoFileDTO;
+import com.convo.cvofile.entity.CvoFile;
+import com.convo.cvofile.repository.CvoFileRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
@@ -17,23 +20,34 @@ import java.util.UUID;
 @Profile("!gcp")
 public class LocalCvoFileService implements CvoFileService {
 
+    private final CvoFileRepository cvoFileRepository;
+
     private final Path storageDir;
 
     public LocalCvoFileService(
+            CvoFileRepository cvoFileRepository,
             @Value("${local.storage.dir}") String storageDir) throws IOException {
+        this.cvoFileRepository = cvoFileRepository;
         this.storageDir = Paths.get(storageDir).toAbsolutePath().normalize();
         Files.createDirectories(this.storageDir);
     }
 
     @Override
-    public String create(MultipartFile file) throws IOException {
+    public CvoFileDTO createCvoFile(CvoFileDTO cvoFileDTO, MultipartFile file) throws IOException {
+
+        // Take care of saving the file proper in the file system
         UUID uuid = UUID.randomUUID();
         Path target = this.storageDir.resolve(uuid.toString()).normalize();
         if (!target.startsWith(this.storageDir)) {
             throw new IOException("Invalid file path: " + file.getOriginalFilename());
         }
         Files.copy(file.getInputStream(), target);
-        return uuid.toString();
+
+        // Take care of saving the file info into the database
+        CvoFile fileEntity = cvoFileDTO.toEntity();
+        fileEntity.setUuid(uuid.toString());
+        cvoFileRepository.save(fileEntity);
+        return CvoFileDTO.from(fileEntity);
     }
 
     @Override

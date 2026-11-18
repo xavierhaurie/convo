@@ -1,0 +1,23 @@
+$kind: http-request
+url: http://localhost:8081/api/v1/file/create
+method: POST
+body:
+  type: formdata
+  content:
+    - type: file
+      key: file
+      src:
+        - /D:/projects/convo/personas/DamienHirst/AI_Hirst_persona.md
+      description: ""
+      disabled: false
+    - type: text
+      key: name
+      value: dAMIEN hIRST 2
+      description: ""
+      disabled: false
+    - type: text
+      key: description
+      value: Another big honcho of the art world
+      description: ""
+      disabled: false
+order: 1000

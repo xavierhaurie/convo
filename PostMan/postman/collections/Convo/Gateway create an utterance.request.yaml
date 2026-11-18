@@ -1,0 +1,27 @@
+$kind: http-request
+url: http://localhost:8080/api/v1/utterance/create
+method: POST
+body:
+  type: formdata
+  content:
+    - type: text
+      key: replyTo
+      value: "0"
+      description: ""
+      disabled: false
+    - type: text
+      key: content
+      value: bla bla from 1 to 2
+      description: ""
+      disabled: false
+    - type: text
+      key: fromPersonId
+      value: "1"
+      description: ""
+      disabled: false
+    - type: text
+      key: toPersonId
+      value: "2"
+      description: ""
+      disabled: false
+order: 16000

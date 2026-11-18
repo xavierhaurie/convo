@@ -38,13 +38,8 @@ public class CvoFileController {
         logger.info("Received upload: {} ({} bytes)",
                 file.getOriginalFilename(), file.getSize());
         try {
-            String uuid = fileService.create(file);
-            CvoFileDTO cvoFileWithUuidDTO = new CvoFileDTO(
-                    cvoFileDTO.id(),
-                    cvoFileDTO.name(),
-                    cvoFileDTO.description(),
-                    uuid);
-            return ResponseEntity.status(HttpStatus.CREATED).body(cvoFileWithUuidDTO);
+            CvoFileDTO savedCvoFileDTO = fileService.createCvoFile(cvoFileDTO, file);
+            return ResponseEntity.status(HttpStatus.CREATED).body(savedCvoFileDTO);
         } catch (Exception e) {
             String errorMessage = "Error saving the file just uploaded: " + file.getOriginalFilename();
             logger.error(errorMessage, e);
